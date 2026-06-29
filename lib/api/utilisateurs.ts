@@ -23,10 +23,7 @@ export function mapAuthUser(u: ApiUtilisateur): AuthUser {
   };
 }
 
-export async function loginRequest(
-  email: string,
-  password: string,
-): Promise<AuthUser> {
+export async function loginRequest(email: string, password: string): Promise<AuthUser> {
   const body: ApiLoginInput = { email, motdepasse: password };
   const data = await apiFetch<ApiUtilisateur>(`/utilisateur/login`, {
     method: "POST",
@@ -45,9 +42,7 @@ export type RegisterData = {
   location?: string;
 };
 
-export async function registerRequest(
-  payload: RegisterData,
-): Promise<AuthUser> {
+export async function registerRequest(payload: RegisterData): Promise<AuthUser> {
   const body: ApiRegisterInput = {
     nom: payload.lastName,
     prenom: payload.firstName,
@@ -90,11 +85,10 @@ export async function updateUtilisateur(
  * Les données ne transitent jamais dans les réponses publiques de liste (/produit/*).
  */
 export async function fetchContactInfo(
-  vendeurId: string,
-  requesterId: string, // Ajoute ce paramètre
+  vendeurId: string, // On retire requesterId
 ): Promise<{ telephone: string; whatsapp: string }> {
-  // N'oublie pas d'utiliser requesterId dans ton URL ou ton fetch
+  // L'URL ne contient plus le paramètre ?requesterId=
   return apiFetch<{ telephone: string; whatsapp: string }>(
-    `/utilisateur/${vendeurId}/contact?requesterId=${requesterId}`,
+    `/utilisateur/${vendeurId}/contact`,
   );
 }

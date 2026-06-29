@@ -60,31 +60,31 @@ export function ContactButtons({
   };
 
   /* ─── Afficher le numéro ─── */
-  const handleRevealContact = async () => {
-    if (!user) {
-      setLoginModal("contact");
-      return;
-    }
-    if (contactState.status === "revealed") return;
+const handleRevealContact = async () => {
+  // 1. On supprime le bloc 'if (!user)' pour ne plus forcer la connexion
+  
+  // 2. On garde cette vérification pour éviter de relancer un appel inutile si c'est déjà affiché
+  if (contactState.status === "revealed") return;
 
-    setContactState({ status: "loading" });
-    try {
-      const info = await fetchContactInfo(sellerId, user.id);
-      setContactState({
-        status: "revealed",
-        telephone: info.telephone,
-        whatsapp: info.whatsapp,
-      });
-    } catch (e) {
-      setContactState({
-        status: "error",
-        message:
-          e instanceof ApiError
-            ? e.message
-            : "Impossible de récupérer les coordonnées.",
-      });
-    }
-  };
+  setContactState({ status: "loading" });
+  try {
+    // 3. Appel de la fonction sans contrainte d'utilisateur
+    const info = await fetchContactInfo(sellerId);
+    setContactState({
+      status: "revealed",
+      telephone: info.telephone,
+      whatsapp: info.whatsapp,
+    });
+  } catch (e) {
+    setContactState({
+      status: "error",
+      message:
+        e instanceof ApiError
+          ? e.message
+          : "Impossible de récupérer les coordonnées.",
+    });
+  }
+};
 
   /* ─── Copier le numéro ─── */
   const handleCopy = async (number: string) => {
@@ -120,7 +120,7 @@ export function ContactButtons({
           className="w-full flex items-center justify-center gap-2 py-3 bg-[var(--foreground)] text-[var(--background)] rounded-full font-bold text-sm hover:opacity-90 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
         >
           <MessageSquare className="w-4 h-4" />
-          Envoyer un message sur Assigame
+          Envoyer un message
         </button>
 
         {/* ── Bouton secondaire : Afficher le numéro ── */}

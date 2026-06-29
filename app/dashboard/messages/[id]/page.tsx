@@ -71,7 +71,11 @@ export default function ConversationPage({
   const [sendError, setSendError] = useState<string | null>(null);
 
   // État pour stocker les informations du produit lié à la discussion
-  const [productInfo, setProductInfo] = useState<{ titre: string; prix?: number; image?: string } | null>(null);
+  const [productInfo, setProductInfo] = useState<{
+    titre: string;
+    prix?: number;
+    image?: string;
+  } | null>(null);
 
   // Référence vers le bas de la liste pour le scroll automatique
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -153,7 +157,9 @@ export default function ConversationPage({
       });
 
       // Pré-remplit automatiquement la zone de saisie
-      setInputValue(`Bonjour ! Je suis intéressé(e) par votre annonce "${titre}". Est-elle toujours disponible ?`);
+      setInputValue(
+        `Bonjour ! Je suis intéressé(e) par votre annonce "${titre}". Est-elle toujours disponible ?`,
+      );
     }
   }, [productId, searchParams]);
 
@@ -239,13 +245,13 @@ export default function ConversationPage({
         contenu: content,
       });
       setMessages((prev) =>
-        prev.map((m) => (m.id_message === optimisticId ? sent : m))
+        prev.map((m) => (m.id_message === optimisticId ? sent : m)),
       );
       prevMessageCountRef.current += 1;
     } catch (err) {
       setMessages((prev) => prev.filter((m) => m.id_message !== optimisticId));
       setSendError(
-        err instanceof ApiError ? err.message : "Échec de l'envoi. Réessayez."
+        err instanceof ApiError ? err.message : "Échec de l'envoi. Réessayez.",
       );
       setInputValue(content);
     } finally {
@@ -425,7 +431,7 @@ export default function ConversationPage({
                       src={
                         msg.expediteur_avatar ||
                         getAvatarUrl(
-                          `${msg.expediteur_prenom} ${msg.expediteur_nom}`
+                          `${msg.expediteur_prenom} ${msg.expediteur_nom}`,
                         )
                       }
                       alt={msg.expediteur_prenom}
