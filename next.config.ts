@@ -1,4 +1,4 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
         port: '',
+        pathname: '/**',
+      },
+      // Ajout de Cloudinary pour la production et le stockage cloud
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
         pathname: '/**',
       },
       // Images de produits/avatars uploadées et servies par le backend Spring Boot (UploadController).

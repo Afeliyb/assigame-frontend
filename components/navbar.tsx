@@ -106,7 +106,7 @@ export function Navbar() {
         }`}
       >
         {/* ── Navbar principale ── */}
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center gap-3">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 h-15 flex items-center gap-3">
           {/* Logo */}
           <Link
             href="/"

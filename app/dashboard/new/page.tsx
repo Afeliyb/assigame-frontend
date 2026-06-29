@@ -11,11 +11,14 @@ import {
 } from "lucide-react";
 import type { Condition } from "@/lib/types";
 import { fetchProduitById, updateProduit } from "@/lib/api/produits";
-import { uploadImages } from "@/lib/api/upload";
 import { ApiError } from "@/lib/api/config";
 
 const CONDITIONS: Condition[] = ["Neuf", "Très bon état", "Bon état", "Satisfaisant"];
 const MAX_IMAGES = 5;
+
+// RAPPEL : Modifie ces deux constantes avec tes informations Cloudinary !
+const CLOUDINARY_CLOUD_NAME = "dnn8wg1hq"; // ex: dxy12345
+const CLOUDINARY_UPLOAD_PRESET = "assigame_preset";
 
 type ImageItem = { key: string; previewUrl: string; file?: File };
 
@@ -89,11 +92,38 @@ function NewListingForm() {
     });
   };
 
+  // 1. Fonction qui gère l'upload direct vers Cloudinary pour un seul fichier
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+      { method: "POST", body: formData }
+    );
+
+    if (!response.ok) throw new Error("Échec de l'upload vers Cloudinary");
+    const data = await response.json();
+    return data.secure_url;
+  };
+
+  // 2. Fonction qui uploade tous les nouveaux fichiers et retourne toutes les URLs (anciennes + nouvelles)
   const resolveImageUrls = async (items: ImageItem[]): Promise<string[]> => {
-    const filesToUpload = items.filter((it) => it.file).map((it) => it.file!);
-    const uploaded = filesToUpload.length > 0 ? await uploadImages(filesToUpload) : [];
-    let cursor = 0;
-    return items.map((it) => (it.file ? uploaded[cursor++] : it.previewUrl));
+    const finalUrls: string[] = [];
+    
+    for (const item of items) {
+      if (item.file) {
+        // C'est une nouvelle image, on l'uploade sur Cloudinary
+        const uploadedUrl = await uploadToCloudinary(item.file);
+        finalUrls.push(uploadedUrl);
+      } else {
+        // C'est une image existante (mode édition), on garde l'URL
+        finalUrls.push(item.previewUrl);
+      }
+    }
+    
+    return finalUrls;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -101,9 +131,13 @@ function NewListingForm() {
     setFormError(null);
     if (imageItems.length === 0) { setFormError("Ajoutez au moins une photo de l'article."); return; }
     if (!category) { setFormError("Sélectionnez une catégorie."); return; }
+    
     setIsSubmitting(true);
+    
     try {
+      // On récupère les URLs définitives via Cloudinary
       const images = await resolveImageUrls(imageItems);
+      
       if (isEditMode && editId) {
         await updateProduit(editId, { title, description, price: parseInt(price, 10), images, condition, categoryId: category });
         await refresh();
@@ -113,7 +147,7 @@ function NewListingForm() {
       }
       router.push("/dashboard/listings");
     } catch (err) {
-      setFormError(err instanceof ApiError ? err.message : "Une erreur est survenue. Réessayez.");
+      setFormError(err instanceof ApiError ? err.message : "Une erreur est survenue lors de l'envoi des images ou de la publication. Réessayez.");
       setIsSubmitting(false);
     }
   };
