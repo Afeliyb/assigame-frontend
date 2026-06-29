@@ -144,11 +144,11 @@ export default function HomePage() {
       <div className="max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-10">
 
         {/* ═══════════════ HERO ═══════════════ */}
-        <Reveal className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center pt-4 pb-12 lg:pt-6 lg:pb-16 mb-4">
+        <Reveal className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center pt-7 pb-12 lg:pt-6 lg:pb-16 mb-4">
           <div className="flex flex-col items-start gap-5">
             <div className="flex items-center gap-2 px-3.5 py-1.5 bg-[var(--surface-elevated)] rounded-full">
-              <Logo className="w-3.5 h-3.5" />
-              <span className="text-xs font-bold"><TogoFlag /> Marketplace togolais N°1</span>
+              <Logo className="w-4 h-8" />
+              <span className="text-xs font-bold"><TogoFlag /> Marketplace N°1</span>
             </div>
             <h1 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-[1.1]">
               {t.home_title}

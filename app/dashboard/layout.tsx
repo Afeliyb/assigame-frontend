@@ -29,11 +29,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [user]);
 
   useEffect(() => {
-    if (!isLoading && !user) router.push("/auth");
-  }, [user, isLoading, router]);
+  if (!isLoading && !user) router.push("/auth");
+  if (!isLoading && user?.isAdmin) router.push("/admin");
+}, [user, isLoading, router]);
 
-  if (isLoading || !user)
-    return <div className="min-h-screen bg-[var(--background)]" />;
+if (isLoading || !user)
+  return <div className="min-h-screen bg-[var(--background)]" />;
 
   const LINKS = [
     { href: "/dashboard",            label: "Aperçu",            icon: LayoutDashboard },

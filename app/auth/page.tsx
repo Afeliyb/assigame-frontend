@@ -48,12 +48,15 @@ export default function AuthPage() {
     setIsSubmitting(false);
 
     if (result.success) {
-      router.push("/dashboard");
+      setTimeout(() => {
+        const stored = localStorage.getItem("assigame_user");
+        const u = stored ? JSON.parse(stored) : null;
+        router.push(u?.isAdmin ? "/admin" : "/dashboard");
+      }, 50);
     } else {
       setError(result.error ?? "Une erreur est survenue. Réessayez.");
     }
   };
-
   return (
     <div className="min-h-screen bg-[var(--background)] flex items-center justify-center p-4 relative overflow-hidden pt-16">
       {/* Decorative bg */}

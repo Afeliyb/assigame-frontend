@@ -405,9 +405,9 @@ export function Navbar() {
 
         {/* ── Barre de recherche mobile (visible uniquement sur l'accueil) ── */}
         {pathname === "/" && (
-          <div className="md:hidden px-4 pb-3">
+          <div className="md:hidden px-15 pb-9">
             <form
-              className="relative w-full"
+              className="relative w-80 max-w-full mx-auto"
               onSubmit={(e) => {
                 e.preventDefault();
                 goToSearch(query);

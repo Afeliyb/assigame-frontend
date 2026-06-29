@@ -20,6 +20,9 @@ export function mapAuthUser(u: ApiUtilisateur): AuthUser {
     whatsapp: u.whatsapp || undefined,
     avatar: u.avatar || undefined,
     bio: u.bio || undefined,
+    // Rôle issu du TypeUtilisateur Spring Boot (ex: "admin", "Utilisateur")
+    role: u.typeutilisateur?.nom_typeutilisateur || "Utilisateur",
+    isAdmin: u.typeutilisateur?.nom_typeutilisateur?.toLowerCase() === "admin",
   };
 }
 
@@ -85,9 +88,8 @@ export async function updateUtilisateur(
  * Les données ne transitent jamais dans les réponses publiques de liste (/produit/*).
  */
 export async function fetchContactInfo(
-  vendeurId: string, // On retire requesterId
+  vendeurId: string,
 ): Promise<{ telephone: string; whatsapp: string }> {
-  // L'URL ne contient plus le paramètre ?requesterId=
   return apiFetch<{ telephone: string; whatsapp: string }>(
     `/utilisateur/${vendeurId}/contact`,
   );

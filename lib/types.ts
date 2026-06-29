@@ -55,6 +55,8 @@ export type AuthUser = {
   whatsapp?: string;
   avatar?: string;
   bio?: string;
+  role?: string;
+  isAdmin?: boolean;
 };
 
 // ============================================================
