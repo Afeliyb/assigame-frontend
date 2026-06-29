@@ -144,7 +144,7 @@ export default function HomePage() {
       <div className="max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-10">
 
         {/* ═══════════════ HERO ═══════════════ */}
-        <Reveal className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center py-12 lg:py-16 mb-4">
+        <Reveal className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center pt-4 pb-12 lg:pt-6 lg:pb-16 mb-4">
           <div className="flex flex-col items-start gap-5">
             <div className="flex items-center gap-2 px-3.5 py-1.5 bg-[var(--surface-elevated)] rounded-full">
               <Logo className="w-3.5 h-3.5" />
@@ -234,7 +234,7 @@ export default function HomePage() {
 
         {/* ═══════════════ BENTO FEATURED ═══════════════ */}
         {!isLoading && !error && featured && (
-          <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 mb-16 auto-rows-[200px]">
+          <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 mb-16 auto-rows-[160px]">
             {/* Featured principal */}
             <Link href={`/product/${featured.id}`}
               className="lg:col-span-3 lg:row-span-2"
@@ -274,40 +274,41 @@ export default function HomePage() {
               </Link>
             )}
 
-            {/* Membres */}
-            <div className="lg:col-span-2 rounded-[1.75rem] p-5 border border-[var(--border-subtle)] bg-[var(--background)] flex flex-col justify-between">
-              <div>
-                <p className="font-bold text-base mb-3">{t.home_members}</p>
-                <div className="flex -space-x-3">
+            {/* Membres de confiance + Tout voir — barre fusionnée compacte */}
+            <div className="lg:col-span-3 flex items-center justify-between px-5 py-4 rounded-[1.75rem] border border-[var(--border-subtle)] bg-[var(--background)]">
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-2">
                   {trustedSellers.slice(0, 4).map((s) => (
-                    <div key={s.id} className="w-10 h-10 rounded-full border-2 border-[var(--background)] overflow-hidden">
+                    <div key={s.id} className="w-8 h-8 rounded-full border-2 border-[var(--background)] overflow-hidden">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={s.avatar || getAvatarUrl(s.name)} alt={s.name} className="w-full h-full object-cover" />
                     </div>
                   ))}
                   {trustedSellers.length > 4 && (
-                    <div className="w-10 h-10 rounded-full border-2 border-[var(--background)] bg-[var(--surface-elevated)] flex items-center justify-center text-xs font-bold">
+                    <div className="w-8 h-8 rounded-full border-2 border-[var(--background)] bg-[var(--surface-elevated)] flex items-center justify-center text-[10px] font-bold">
                       +{trustedSellers.length - 4}
                     </div>
                   )}
                 </div>
+                <div>
+                  <p className="font-bold text-sm leading-tight">{t.home_members}</p>
+                  <p className="text-[11px] text-black/40 dark:text-white/40 mt-0.5">{t.home_sellers}</p>
+                </div>
               </div>
-              <p className="text-xs text-black/40 dark:text-white/40">{t.home_sellers}</p>
+              <Link
+                href="/browse"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--surface-elevated)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all text-sm font-bold shrink-0"
+                onMouseEnter={() => setCursorLabel("Go")} onMouseLeave={() => setCursorLabel(null)}
+              >
+                {t.home_see_all} <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
-
-            {/* CTA tout voir */}
-            <Link href="/browse"
-              className="lg:col-span-1 rounded-[1.75rem] p-5 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] flex flex-col justify-between hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              onMouseEnter={() => setCursorLabel("Go")} onMouseLeave={() => setCursorLabel(null)}>
-              <ArrowUpRight className="w-5 h-5 opacity-50" />
-              <h3 className="font-display font-bold text-lg leading-tight">{t.home_see_all}</h3>
-            </Link>
           </div>
         )}
 
         {/* ═══════════════ CATÉGORIES ═══════════════ */}
         {categories.length > 0 && (
-          <Reveal className="mb-16">
+          <Reveal className="mb-10">
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-display font-black text-2xl">Toutes les catégories</h2>
               <Link href="/browse" className="text-xs font-bold uppercase tracking-wider opacity-50 hover:opacity-100 transition-opacity">
@@ -322,7 +323,7 @@ export default function HomePage() {
                   <Link
                     key={cat.id}
                     href={`/browse?category=${cat.slug}`}
-                    className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-[var(--surface-elevated)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all group"
+                    className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-[var(--surface-elevated)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all group"
                   >
                     <div className="w-9 h-9 rounded-xl bg-[var(--background)] group-hover:bg-white/20 flex items-center justify-center transition-colors">
                       <Icon className="w-5 h-5" />
@@ -338,7 +339,7 @@ export default function HomePage() {
 
         {/* ═══════════════ MARQUEE ═══════════════ */}
         {categories.length > 0 && (
-          <Reveal className="mb-16 -mx-4 sm:-mx-6 lg:-mx-10">
+          <Reveal className="mb-10 -mx-4 sm:-mx-6 lg:-mx-10">
             <InfiniteMarquee speed={30} className="py-3">
               {categories.concat(categories).map((cat, i) => (
                 <div key={`${cat.id}-${i}`} className="mx-3 px-5 py-2.5 rounded-full border border-[var(--border-subtle)] bg-[var(--surface-elevated)] text-sm font-bold flex items-center gap-2 whitespace-nowrap">
@@ -351,7 +352,7 @@ export default function HomePage() {
 
         {/* ═══════════════ PAR VILLE ═══════════════ */}
         {cityStats.length > 0 && (
-          <Reveal className="mb-16">
+          <Reveal className="mb-10">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="font-display font-black text-2xl">Annonces par ville</h2>
@@ -365,7 +366,7 @@ export default function HomePage() {
                 <Link
                   key={city}
                   href={`/browse?city=${encodeURIComponent(city)}`}
-                  className="flex flex-col gap-2 p-4 rounded-2xl bg-[var(--surface-elevated)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all group"
+                  className="flex flex-col gap-1.5 p-3 rounded-2xl bg-[var(--surface-elevated)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all group"
                 >
                   <MapPin className="w-4 h-4 opacity-40 group-hover:opacity-60" />
                   <div>
@@ -380,7 +381,7 @@ export default function HomePage() {
 
         {/* ═══════════════ TENDANCES ═══════════════ */}
         {trending.length > 0 && (
-          <Reveal className="mb-16">
+          <Reveal className="mb-10">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
                 <h2 className="font-display font-black text-2xl">{t.home_trending}</h2>
@@ -411,12 +412,12 @@ export default function HomePage() {
         )}
 
         {/* ═══════════════ COMMENT ÇA MARCHE ═══════════════ */}
-        <Reveal className="mb-16">
-          <div className="p-8 lg:p-10 rounded-[2rem] bg-[var(--surface-elevated)] border border-[var(--border-subtle)]">
-            <h2 className="font-display font-black text-2xl mb-8 text-center">
+        <Reveal className="mb-10">
+          <div className="p-6 lg:p-8 rounded-[2rem] bg-[var(--surface-elevated)] border border-[var(--border-subtle)]">
+            <h2 className="font-display font-black text-xl mb-6 text-center">
               Comment ça marche ?
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
               {[
                 {
                   step: "01",
