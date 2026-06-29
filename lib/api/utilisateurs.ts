@@ -81,15 +81,13 @@ export async function updateUtilisateur(
   return mapAuthUser(data);
 }
 
-/** Coordonnées de contact d'un vendeur — endpoint protégé côté backend.
- *  Ne fonctionne que si `requesterId` correspond à un utilisateur valide en base.
- *  Les données ne transitent jamais dans les réponses publiques (/produit/*).
+/** Coordonnées de contact d'un vendeur — Disponible publiquement au clic.
+ * Les données ne transitent jamais dans les réponses publiques de liste (/produit/*).
  */
 export async function fetchContactInfo(
   vendeurId: string,
-  requesterId: string,
 ): Promise<{ telephone: string; whatsapp: string }> {
   return apiFetch<{ telephone: string; whatsapp: string }>(
-    `/utilisateur/${vendeurId}/contact?requesterId=${requesterId}`,
+    `/utilisateur/${vendeurId}/contact`,
   );
 }

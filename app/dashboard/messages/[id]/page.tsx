@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   Loader2,
@@ -57,6 +58,9 @@ export default function ConversationPage({
   params: Promise<{ id: string }>;
 }) {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const productId = searchParams.get("produit");
+
   const [interlocuteurId, setInterlocuteurId] = useState<string | null>(null);
   const [interlocuteur, setInterlocuteur] = useState<Seller | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -65,6 +69,9 @@ export default function ConversationPage({
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
+
+  // État pour stocker les informations du produit lié à la discussion
+  const [productInfo, setProductInfo] = useState<{ titre: string; prix?: number; image?: string } | null>(null);
 
   // Référence vers le bas de la liste pour le scroll automatique
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -84,14 +91,11 @@ export default function ConversationPage({
 
   // ============================================================
   // SCROLL : détecter si l'utilisateur est proche du bas
-  // On ne fait défiler automatiquement que dans ce cas, pour
-  // ne pas l'interrompre s'il remonte lire d'anciens messages.
   // ============================================================
   const handleScroll = useCallback(() => {
     const el = scrollContainerRef.current;
     if (!el) return;
     const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-    // "Proche du bas" = moins de 80px au-dessus du bas
     isNearBottomRef.current = distanceFromBottom < 80;
   }, []);
 
@@ -131,20 +135,39 @@ export default function ConversationPage({
   }, [interlocuteurId, user]);
 
   // ============================================================
+  // ── RECRÉATION SECURE : LECTURE DU CONTEXTE PRODUIT DEPUIS L'URL
+  // ============================================================
+  useEffect(() => {
+    if (!productId) return;
+
+    // Récupération directe et instantanée depuis les Query Params passés par ContactButtons
+    const titre = searchParams.get("titre");
+    const prixParam = searchParams.get("prix");
+    const image = searchParams.get("image");
+
+    if (titre) {
+      setProductInfo({
+        titre,
+        prix: prixParam ? Number(prixParam) : undefined,
+        image: image || undefined,
+      });
+
+      // Pré-remplit automatiquement la zone de saisie
+      setInputValue(`Bonjour ! Je suis intéressé(e) par votre annonce "${titre}". Est-elle toujours disponible ?`);
+    }
+  }, [productId, searchParams]);
+
+  // ============================================================
   // SCROLL après chargement initial : forcer vers le bas
   // ============================================================
   useEffect(() => {
     if (!isLoading && messages.length > 0) {
-      // On force le scroll vers le bas à l'ouverture de la conversation
       setTimeout(() => scrollToBottom(true), 100);
     }
   }, [isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ============================================================
   // SHORT POLLING — 3 secondes
-  // Recharge silencieusement les messages en arrière-plan.
-  // Ne redémarre qu'après la fin du chargement initial.
-  // Le clearInterval au démontage évite les fuites mémoire.
   // ============================================================
   useEffect(() => {
     if (!interlocuteurId || !user || isLoading) return;
@@ -154,37 +177,28 @@ export default function ConversationPage({
         const fresh = await fetchConversation(user.id, interlocuteurId);
 
         setMessages((prev) => {
-          // Optimisation : ne met à jour l'état que si les données ont vraiment changé
-          // (évite un re-render inutile toutes les 3s quand il n'y a pas de nouveaux messages)
           if (fresh.length === prev.length) {
-            // Même nombre de messages → on vérifie le contenu du dernier
             const lastFresh = fresh[fresh.length - 1];
             const lastPrev = prev[prev.length - 1];
             if (
               lastFresh?.id_message === lastPrev?.id_message &&
               lastFresh?.lu === lastPrev?.lu
             ) {
-              return prev; // Aucun changement → React ne re-render pas
+              return prev;
             }
           }
           return fresh;
         });
 
-        // Scroll automatique si de nouveaux messages sont arrivés et l'utilisateur est en bas
         if (fresh.length > prevMessageCountRef.current) {
           prevMessageCountRef.current = fresh.length;
-          scrollToBottom(); // Respecte la position de l'utilisateur (scrolle seulement s'il est en bas)
+          scrollToBottom();
         }
       } catch {
-        // Silencieux : un échec de polling ne doit pas casser l'interface
-        // La prochaine tentative aura lieu dans 3 secondes
+        // Silencieux
       }
-    }, 3000); // ← 3 secondes
+    }, 3000);
 
-    // NETTOYAGE : clearInterval est appelé quand le composant est démonté
-    // ou quand l'une des dépendances change (ex: changement de conversation).
-    // Sans ce cleanup, l'intervalle continuerait à tourner en arrière-plan
-    // même après que l'utilisateur ait quitté la page (fuite mémoire).
     return () => clearInterval(intervalId);
   }, [interlocuteurId, user, isLoading, scrollToBottom]);
 
@@ -199,8 +213,6 @@ export default function ConversationPage({
     setSendError(null);
     setIsSending(true);
 
-    // Optimistic update : on ajoute le message localement immédiatement
-    // pour que l'utilisateur ne ressente pas la latence réseau.
     const optimisticId = Date.now();
     const optimistic: Message = {
       id_message: optimisticId,
@@ -218,7 +230,6 @@ export default function ConversationPage({
 
     setMessages((prev) => [...prev, optimistic]);
     setInputValue("");
-    // On force le scroll vers le bas quand on envoie un message
     setTimeout(() => scrollToBottom(true), 50);
 
     try {
@@ -227,13 +238,11 @@ export default function ConversationPage({
         idDestinataire: interlocuteurId,
         contenu: content,
       });
-      // On remplace le message optimiste par le vrai (avec l'ID serveur définitif)
       setMessages((prev) =>
         prev.map((m) => (m.id_message === optimisticId ? sent : m))
       );
       prevMessageCountRef.current += 1;
     } catch (err) {
-      // Échec : on retire le message optimiste et on restaure le texte
       setMessages((prev) => prev.filter((m) => m.id_message !== optimisticId));
       setSendError(
         err instanceof ApiError ? err.message : "Échec de l'envoi. Réessayez."
@@ -245,7 +254,6 @@ export default function ConversationPage({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Ctrl+Entrée ou Cmd+Entrée → envoyer. Entrée seul → saut de ligne.
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       e.preventDefault();
       handleSend();
@@ -254,9 +262,6 @@ export default function ConversationPage({
 
   if (!user) return null;
 
-  // ============================================================
-  // RENDU
-  // ============================================================
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] max-w-3xl">
       {/* ---- EN-TÊTE ---- */}
@@ -295,6 +300,46 @@ export default function ConversationPage({
         ) : null}
       </div>
 
+      {/* ---- BANDEAU CONTEXTE PRODUIT ---- */}
+      {productInfo && (
+        <div className="flex items-center justify-between p-3 bg-[var(--surface-elevated)] border-b border-[var(--border-subtle)] shrink-0 animate-in fade-in duration-200">
+          <div className="flex items-center gap-3 min-w-0">
+            {productInfo.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={productInfo.image}
+                alt={productInfo.titre}
+                className="w-11 h-11 object-cover rounded-xl border border-[var(--border-subtle)] shrink-0"
+              />
+            ) : (
+              <div className="w-11 h-11 bg-[var(--background)] border border-[var(--border-subtle)] rounded-xl flex items-center justify-center shrink-0">
+                <ShoppingBag className="w-5 h-5 opacity-40" />
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-wider font-bold text-black/40 dark:text-white/40 flex items-center gap-1">
+                <ShoppingBag className="w-3 h-3" /> Vous le contactez pour :
+              </p>
+              <h4 className="text-sm font-bold text-[var(--foreground)] truncate">
+                {productInfo.titre}
+              </h4>
+              {productInfo.prix !== undefined && (
+                <p className="text-xs font-semibold text-black/60 dark:text-white/60">
+                  {productInfo.prix.toLocaleString("fr-FR")} FCFA
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setProductInfo(null)}
+            className="text-xs font-bold px-3 py-1.5 rounded-xl bg-[var(--background)] border border-[var(--border-subtle)] hover:bg-[var(--surface-elevated)] transition-all shrink-0"
+          >
+            Masquer
+          </button>
+        </div>
+      )}
+
       {/* ---- CORPS — liste des bulles ---- */}
       <div
         ref={scrollContainerRef}
@@ -331,7 +376,6 @@ export default function ConversationPage({
 
           return (
             <React.Fragment key={msg.id_message}>
-              {/* Séparateur de date */}
               {showDateSeparator && (
                 <div className="flex items-center gap-3 my-4">
                   <div className="flex-1 h-px bg-[var(--border-subtle)]" />
@@ -342,7 +386,6 @@ export default function ConversationPage({
                 </div>
               )}
 
-              {/* Contexte produit (première fois qu'un produit apparaît) */}
               {msg.produit_ref_id && !prevMsg?.produit_ref_id && (
                 <Link
                   href={`/product/${msg.produit_ref_id}`}
@@ -372,7 +415,6 @@ export default function ConversationPage({
                 </Link>
               )}
 
-              {/* Bulle de message */}
               <div
                 className={`flex items-end gap-2 ${isOwn ? "flex-row-reverse" : "flex-row"}`}
               >
@@ -416,7 +458,6 @@ export default function ConversationPage({
           );
         })}
 
-        {/* Ancre invisible pour scrollToBottom */}
         <div ref={bottomRef} />
       </div>
 
