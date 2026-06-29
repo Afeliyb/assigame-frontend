@@ -60,31 +60,35 @@ export function ContactButtons({
   };
 
   /* ─── Afficher le numéro ─── */
-const handleRevealContact = async () => {
-  // 1. On supprime le bloc 'if (!user)' pour ne plus forcer la connexion
-  
-  // 2. On garde cette vérification pour éviter de relancer un appel inutile si c'est déjà affiché
-  if (contactState.status === "revealed") return;
+  const handleRevealContact = async () => {
+    // 1. NOUVEAU : On exige la connexion. Si pas d'utilisateur, on ouvre la modal et on coupe la fonction.
+    if (!user) {
+      setLoginModal("contact");
+      return;
+    }
 
-  setContactState({ status: "loading" });
-  try {
-    // 3. Appel de la fonction sans contrainte d'utilisateur
-    const info = await fetchContactInfo(sellerId);
-    setContactState({
-      status: "revealed",
-      telephone: info.telephone,
-      whatsapp: info.whatsapp,
-    });
-  } catch (e) {
-    setContactState({
-      status: "error",
-      message:
-        e instanceof ApiError
-          ? e.message
-          : "Impossible de récupérer les coordonnées.",
-    });
-  }
-};
+    // 2. On garde cette vérification pour éviter de relancer un appel inutile si c'est déjà affiché
+    if (contactState.status === "revealed") return;
+
+    setContactState({ status: "loading" });
+    try {
+      // 3. Appel de la fonction (l'utilisateur est obligatoirement connecté à ce stade)
+      const info = await fetchContactInfo(sellerId);
+      setContactState({
+        status: "revealed",
+        telephone: info.telephone,
+        whatsapp: info.whatsapp,
+      });
+    } catch (e) {
+      setContactState({
+        status: "error",
+        message:
+          e instanceof ApiError
+            ? e.message
+            : "Impossible de récupérer les coordonnées.",
+      });
+    }
+  };
 
   /* ─── Copier le numéro ─── */
   const handleCopy = async (number: string) => {
