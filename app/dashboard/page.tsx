@@ -63,7 +63,7 @@ export default function DashboardOverviewPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="font-display font-black text-2xl lg:text-3xl">
-            Bonjour, {user.firstName} 👋
+            Bonjour {user.firstName} 
           </h1>
           <p className="text-sm text-black/50 dark:text-white/50 mt-0.5">
             Voici un résumé de votre activité.

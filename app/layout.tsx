@@ -11,7 +11,8 @@ import { FavoritesProvider } from "@/components/favorites-provider";
 import { LanguageProvider }  from "@/components/language-provider";
 import { LocationProvider }  from "@/components/location-provider";
 import { Navbar }            from "@/components/navbar";
-import { Footer }            from "@/components/footer";
+// On importe le nouveau composant conditionnel
+import { ConditionalFooter } from "@/components/conditional-footer"; 
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,7 +59,8 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
                         <main className="flex-1 flex flex-col relative">
                           {children}
                         </main>
-                        <Footer />
+                        {/* Le composant intelligent qui gère l'affichage */}
+                        <ConditionalFooter />
                       </CursorProvider>
                     </FavoritesProvider>
                   </ListingsProvider>

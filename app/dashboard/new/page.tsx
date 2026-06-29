@@ -340,7 +340,7 @@ export default function NewListingPage() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 20, scale: 0.98 }}
         transition={{ type: "spring", damping: 28, stiffness: 300 }}
-        className="fixed z-[90] inset-x-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 top-[72px] bottom-4 sm:bottom-auto w-full sm:w-[480px] bg-[var(--background)] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-[var(--border-subtle)]"
+        className="fixed z-[90] left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-[480px] top-[72px] bottom-4 sm:bottom-auto bg-[var(--background)] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-[var(--border-subtle)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* En-tête modal */}

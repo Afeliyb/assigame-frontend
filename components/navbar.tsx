@@ -2,11 +2,23 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, useScroll, AnimatePresence } from "motion/react";
 import {
-  Search, Sun, Moon, Menu, X, Plus, MapPin, ChevronDown,
-  Globe, Banknote, Clock, Check, Wifi,
+  Search,
+  Sun,
+  Moon,
+  Menu,
+  X,
+  Plus,
+  MapPin,
+  ChevronDown,
+  Globe,
+  Banknote,
+  Clock,
+  Check,
+  Wifi,
+  MessageSquare,
 } from "lucide-react";
 import { Logo } from "./logo";
 import { TogoFlag, FranceFlag, UKFlag } from "./flags";
@@ -17,6 +29,7 @@ import { useLanguage } from "./language-provider";
 import { useLocation } from "./location-provider";
 import { getAvatarUrl } from "@/lib/utils";
 import { TOGO_REGIONS, TOGO_DIAL } from "@/lib/togo";
+import { fetchNonLus } from "@/lib/api/messages";
 
 export function Navbar() {
   const { scrollY } = useScroll();
@@ -27,15 +40,34 @@ export function Navbar() {
   const { selectedCity, setSelectedCity } = useLocation();
   const router = useRouter();
 
-  const [scrolled, setScrolled]         = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [query, setQuery]               = useState("");
+  const [query, setQuery] = useState("");
   const [locationOpen, setLocationOpen] = useState(false);
-  const [langOpen, setLangOpen]         = useState(false);
-  const [isMounted, setIsMounted]       = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // NOUVEAU : État pour les messages non lus
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  // NOUVEAU : Récupération des messages en temps réel (toutes les 30s)
+  useEffect(() => {
+    if (!user) return;
+    fetchNonLus(user.id)
+      .then(setUnreadMessages)
+      .catch(() => {});
+    const interval = setInterval(() => {
+      fetchNonLus(user.id)
+        .then(setUnreadMessages)
+        .catch(() => {});
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  const pathname = usePathname(); // Ajoute cette ligne
 
   const locationRef = useRef<HTMLDivElement>(null);
-  const langRef     = useRef<HTMLDivElement>(null);
+  const langRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -45,7 +77,10 @@ export function Navbar() {
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (locationRef.current && !locationRef.current.contains(e.target as Node))
+      if (
+        locationRef.current &&
+        !locationRef.current.contains(e.target as Node)
+      )
         setLocationOpen(false);
       if (langRef.current && !langRef.current.contains(e.target as Node))
         setLangOpen(false);
@@ -56,7 +91,9 @@ export function Navbar() {
 
   const goToSearch = (value: string) => {
     const trimmed = value.trim();
-    router.push(trimmed ? `/browse?q=${encodeURIComponent(trimmed)}` : "/browse");
+    router.push(
+      trimmed ? `/browse?q=${encodeURIComponent(trimmed)}` : "/browse",
+    );
   };
 
   return (
@@ -68,13 +105,16 @@ export function Navbar() {
             : "bg-transparent"
         }`}
       >
-        
         {/* ── Navbar principale ── */}
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 h-14 flex items-center gap-3">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0 group mr-2">
+          <Link
+            href="/"
+            className="flex items-center gap-2 shrink-0 group mr-2"
+          >
             <Logo className="w-7 h-7 group-hover:scale-110 transition-transform" />
-            <span className="font-display font-black text-xl tracking-tight hidden sm:inline">
+            {/* Texte ASSIGAME visible partout */}
+            <span className="font-display font-black text-xl tracking-tight inline">
               ASSIGAME
             </span>
           </Link>
@@ -103,7 +143,10 @@ export function Navbar() {
           {/* Barre de recherche */}
           <form
             className="hidden md:flex relative group max-w-[260px] lg:max-w-[320px] w-full"
-            onSubmit={(e) => { e.preventDefault(); goToSearch(query); }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              goToSearch(query);
+            }}
           >
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-black/40 dark:text-white/40" />
             <input
@@ -119,11 +162,13 @@ export function Navbar() {
 
           {/* Controls */}
           <div className="flex items-center gap-1.5">
-
             {/* ── Localisation ── */}
             <div ref={locationRef} className="relative hidden sm:block">
               <button
-                onClick={() => { setLocationOpen((v) => !v); setLangOpen(false); }}
+                onClick={() => {
+                  setLocationOpen((v) => !v);
+                  setLangOpen(false);
+                }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[13px] font-semibold transition-all border ${
                   locationOpen || selectedCity
                     ? "bg-[var(--foreground)] text-[var(--background)] border-transparent"
@@ -132,7 +177,9 @@ export function Navbar() {
               >
                 <TogoFlag className="w-4 h-3" />
                 <span>{selectedCity ?? "Togo"}</span>
-                <ChevronDown className={`w-3 h-3 transition-transform ${locationOpen ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`w-3 h-3 transition-transform ${locationOpen ? "rotate-180" : ""}`}
+                />
               </button>
 
               <AnimatePresence>
@@ -148,7 +195,9 @@ export function Navbar() {
                     <div className="p-3 border-b border-[var(--border-subtle)] flex items-center gap-2">
                       <TogoFlag className="w-6 h-4" />
                       <div>
-                        <p className="text-xs font-bold">Togo · {TOGO_DIAL.code}</p>
+                        <p className="text-xs font-bold">
+                          Togo · {TOGO_DIAL.code}
+                        </p>
                         <p className="text-[10px] text-black/40 dark:text-white/40">
                           Sélectionnez votre ville
                         </p>
@@ -158,7 +207,10 @@ export function Navbar() {
                     <div className="p-2 max-h-72 overflow-y-auto">
                       {/* Tout le Togo */}
                       <button
-                        onClick={() => { setSelectedCity(null); setLocationOpen(false); }}
+                        onClick={() => {
+                          setSelectedCity(null);
+                          setLocationOpen(false);
+                        }}
                         className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all ${
                           !selectedCity
                             ? "bg-[var(--foreground)] text-[var(--background)]"
@@ -167,7 +219,9 @@ export function Navbar() {
                       >
                         <TogoFlag className="w-4 h-3" />
                         Tout le Togo
-                        {!selectedCity && <Check className="w-3.5 h-3.5 ml-auto" />}
+                        {!selectedCity && (
+                          <Check className="w-3.5 h-3.5 ml-auto" />
+                        )}
                       </button>
 
                       {/* Régions */}
@@ -179,7 +233,10 @@ export function Navbar() {
                           {region.cities.map((city) => (
                             <button
                               key={city}
-                              onClick={() => { setSelectedCity(city); setLocationOpen(false); }}
+                              onClick={() => {
+                                setSelectedCity(city);
+                                setLocationOpen(false);
+                              }}
                               className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm transition-all ${
                                 selectedCity === city
                                   ? "bg-[var(--foreground)] text-[var(--background)] font-semibold"
@@ -188,7 +245,9 @@ export function Navbar() {
                             >
                               <MapPin className="w-3 h-3 opacity-40" />
                               {city}
-                              {selectedCity === city && <Check className="w-3 h-3 ml-auto" />}
+                              {selectedCity === city && (
+                                <Check className="w-3 h-3 ml-auto" />
+                              )}
                             </button>
                           ))}
                         </div>
@@ -211,7 +270,10 @@ export function Navbar() {
             {/* ── Langue ── */}
             <div ref={langRef} className="relative hidden lg:block">
               <button
-                onClick={() => { setLangOpen((v) => !v); setLocationOpen(false); }}
+                onClick={() => {
+                  setLangOpen((v) => !v);
+                  setLocationOpen(false);
+                }}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[13px] font-bold border border-[var(--border-subtle)] hover:bg-[var(--surface-elevated)] transition-all"
               >
                 <Globe className="w-3.5 h-3.5 opacity-60" />
@@ -227,12 +289,19 @@ export function Navbar() {
                     className="absolute right-0 top-full mt-2 w-44 bg-[var(--background)] border border-[var(--border-subtle)] rounded-2xl shadow-[var(--shadow-elegant)] z-50 p-1.5"
                   >
                     {[
-                      { code: "fr" as const, label: "Français",  Flag: FranceFlag },
-                      { code: "en" as const, label: "English",   Flag: UKFlag },
+                      {
+                        code: "fr" as const,
+                        label: "Français",
+                        Flag: FranceFlag,
+                      },
+                      { code: "en" as const, label: "English", Flag: UKFlag },
                     ].map(({ code, label, Flag }) => (
                       <button
                         key={code}
-                        onClick={() => { setLang(code); setLangOpen(false); }}
+                        onClick={() => {
+                          setLang(code);
+                          setLangOpen(false);
+                        }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-all ${
                           lang === code
                             ? "bg-[var(--foreground)] text-[var(--background)] font-bold"
@@ -241,7 +310,9 @@ export function Navbar() {
                       >
                         <Flag className="w-5 h-3.5 rounded-[2px]" />
                         {label}
-                        {lang === code && <Check className="w-3.5 h-3.5 ml-auto" />}
+                        {lang === code && (
+                          <Check className="w-3.5 h-3.5 ml-auto" />
+                        )}
                       </button>
                     ))}
                   </motion.div>
@@ -256,7 +327,11 @@ export function Navbar() {
                 className="p-2 rounded-xl hover:bg-[var(--surface-elevated)] transition-colors"
                 aria-label="Basculer le thème"
               >
-                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                {theme === "dark" ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
               </button>
             )}
 
@@ -282,21 +357,73 @@ export function Navbar() {
               </Link>
             )}
 
-            {/* ── CTA Vendre ── */}
-            <Link
-              href="/dashboard/new"
-              className="flex items-center gap-1.5 px-4 py-2 bg-[var(--foreground)] text-[var(--background)] rounded-full font-bold text-sm hover:opacity-90 transition-opacity whitespace-nowrap"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Vendre</span>
-            </Link>
+            {/* ── Actions Mobile / Desktop ── */}
+            {user ? (
+              <div className="flex items-center gap-1.5">
+                {/* Icône Messages sur Mobile (remplace le bouton vendre) */}
+                <Link
+                  href="/dashboard/messages"
+                  className="relative p-2 md:hidden rounded-xl hover:bg-[var(--surface-elevated)] transition-colors"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  {unreadMessages > 0 && (
+                    <span className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white border border-[var(--background)]">
+                      {unreadMessages > 9 ? "9+" : unreadMessages}
+                    </span>
+                  )}
+                </Link>
+
+                {/* Bouton Vendre (Restreint au Desktop) */}
+                <Link
+                  href="/dashboard/new"
+                  className="hidden md:flex items-center gap-1.5 px-4 py-2 bg-[var(--foreground)] text-[var(--background)] rounded-full font-bold text-sm hover:opacity-90 transition-opacity whitespace-nowrap"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Vendre</span>
+                </Link>
+              </div>
+            ) : (
+              /* Visiteur non connecté : on garde un bouton de connexion/vente générique */
+              <Link
+                href="/auth"
+                className="hidden md:flex items-center gap-1.5 px-4 py-2 bg-[var(--foreground)] text-[var(--background)] rounded-full font-bold text-sm hover:opacity-90 transition-opacity"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Vendre</span>
+              </Link>
+            )}
 
             {/* ── Burger mobile ── */}
-            <button className="md:hidden p-2 rounded-xl hover:bg-[var(--surface-elevated)]" onClick={() => setMobileMenuOpen(true)}>
+            <button
+              className="md:hidden p-2 rounded-xl hover:bg-[var(--surface-elevated)]"
+              onClick={() => setMobileMenuOpen(true)}
+            >
               <Menu className="w-5 h-5" />
             </button>
           </div>
         </div>
+
+        {/* ── Barre de recherche mobile (visible uniquement sur l'accueil) ── */}
+        {pathname === "/" && (
+          <div className="md:hidden px-4 pb-3">
+            <form
+              className="relative w-full"
+              onSubmit={(e) => {
+                e.preventDefault();
+                goToSearch(query);
+              }}
+            >
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-black/40 dark:text-white/40" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Rechercher un article..."
+                className="w-full pl-9 pr-4 py-2.5 rounded-2xl bg-[var(--surface-elevated)] border border-[var(--border-subtle)] focus:border-black/20 dark:focus:border-white/20 outline-none text-sm font-medium transition-all shadow-sm"
+              />
+            </form>
+          </div>
+        )}
       </motion.nav>
 
       {/* ── Menu mobile ── */}
@@ -348,13 +475,21 @@ export function Navbar() {
                     />
                     <div>
                       <p className="font-bold text-sm">{user.name}</p>
-                      <p className="text-xs text-black/50 dark:text-white/50">Tableau de bord</p>
+                      <p className="text-xs text-black/50 dark:text-white/50">
+                        Tableau de bord
+                      </p>
                     </div>
                   </Link>
                 )}
 
                 {/* Recherche */}
-                <form onSubmit={(e) => { e.preventDefault(); setMobileMenuOpen(false); goToSearch(query); }}>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setMobileMenuOpen(false);
+                    goToSearch(query);
+                  }}
+                >
                   <div className="relative">
                     <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
                     <input
@@ -386,20 +521,22 @@ export function Navbar() {
                     >
                       Tout le Togo
                     </button>
-                    {TOGO_REGIONS.flatMap((r) => r.cities.slice(0, 2)).map((city) => (
-                      <button
-                        key={city}
-                        onClick={() => setSelectedCity(city)}
-                        className={`px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1 ${
-                          selectedCity === city
-                            ? "bg-[var(--foreground)] text-[var(--background)]"
-                            : "bg-[var(--surface-elevated)]"
-                        }`}
-                      >
-                        <MapPin className="w-3 h-3 opacity-50" />
-                        {city}
-                      </button>
-                    ))}
+                    {TOGO_REGIONS.flatMap((r) => r.cities.slice(0, 2)).map(
+                      (city) => (
+                        <button
+                          key={city}
+                          onClick={() => setSelectedCity(city)}
+                          className={`px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1 ${
+                            selectedCity === city
+                              ? "bg-[var(--foreground)] text-[var(--background)]"
+                              : "bg-[var(--surface-elevated)]"
+                          }`}
+                        >
+                          <MapPin className="w-3 h-3 opacity-50" />
+                          {city}
+                        </button>
+                      ),
+                    )}
                   </div>
                 </div>
 
@@ -429,8 +566,12 @@ export function Navbar() {
                   </p>
                   <div className="flex gap-2">
                     {[
-                      { code: "fr" as const, label: "Français", Flag: FranceFlag },
-                      { code: "en" as const, label: "English",  Flag: UKFlag },
+                      {
+                        code: "fr" as const,
+                        label: "Français",
+                        Flag: FranceFlag,
+                      },
+                      { code: "en" as const, label: "English", Flag: UKFlag },
                     ].map(({ code, label, Flag }) => (
                       <button
                         key={code}
