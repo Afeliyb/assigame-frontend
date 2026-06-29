@@ -170,7 +170,7 @@ export default function ConversationPage({
     if (!isLoading && messages.length > 0) {
       setTimeout(() => scrollToBottom(true), 100);
     }
-  }, [isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoading, messages.length, scrollToBottom]);
 
   // ============================================================
   // SHORT POLLING — 3 secondes
@@ -269,7 +269,7 @@ export default function ConversationPage({
   if (!user) return null;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] max-w-3xl">
+    <div className="flex flex-col h-[calc(100dvh-136px)] md:h-[calc(100dvh-64px)] w-full max-w-3xl overflow-hidden">
       {/* ---- EN-TÊTE ---- */}
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border-subtle)] bg-[var(--background)] shrink-0">
         <Link
