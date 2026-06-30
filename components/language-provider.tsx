@@ -11,10 +11,10 @@ const FR = {
   nav_location: "Localisation",
   nav_all_togo: "Tout le Togo",
 
-  home_title: "Le Grand Marché, en ligne.",
+  home_title: "Le Grand Marché en ligne.",
   home_subtitle: "Trouvez, achetez et vendez en toute confiance.",
   home_cta_explore: "Explorer le marché",
-  home_cta_sell: "Publier un article",
+  home_cta_sell: "Publier",
   home_trending: "Tendances",
   home_see_all: "Tout voir",
   home_members: "Membres de confiance",
