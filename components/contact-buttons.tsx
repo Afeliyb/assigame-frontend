@@ -27,6 +27,8 @@ type Props = {
   sellerName: string;
   productTitle?: string;
   productId?: string;
+  productPrice?: number;
+  productImage?: string;
   disabled?: boolean;
 };
 
@@ -35,6 +37,8 @@ export function ContactButtons({
   sellerName,
   productTitle,
   productId,
+  productPrice,
+  productImage,
   disabled = false,
 }: Props) {
   const { user } = useAuth();
@@ -53,12 +57,17 @@ export function ContactButtons({
       setLoginModal("message");
       return;
     }
-    const href = productId
-      ? `/dashboard/messages/${sellerId}?produit=${productId}`
-      : `/dashboard/messages/${sellerId}`;
-    window.location.href = href;
+    if (!productId) {
+      window.location.href = `/dashboard/messages/${sellerId}`;
+      return;
+    }
+    const params = new URLSearchParams({ produit: productId });
+    if (productTitle) params.set("titre", productTitle);
+    if (productPrice !== undefined) params.set("prix", String(productPrice));
+    if (productImage) params.set("image", productImage);
+    window.location.href = `/dashboard/messages/${sellerId}?${params.toString()}`;
   };
-
+    
   /* ─── Afficher le numéro ─── */
   const handleRevealContact = async () => {
     // 1. NOUVEAU : On exige la connexion. Si pas d'utilisateur, on ouvre la modal et on coupe la fonction.

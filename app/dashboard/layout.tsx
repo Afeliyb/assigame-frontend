@@ -37,7 +37,7 @@ if (isLoading || !user)
   return <div className="min-h-screen bg-[var(--background)]" />;
 
   const LINKS = [
-    { href: "/dashboard",            label: "Aperçu",            icon: LayoutDashboard },
+    { href: "/dashboard",            label: "Statistiques",            icon: LayoutDashboard },
     { href: "/dashboard/listings",   label: "Mes annonces",      icon: Tags },
     { href: "/dashboard/favorites",  label: "Mes favoris",       icon: Heart,         badge: favoriteIds.size > 0 ? favoriteIds.size : undefined },
     { href: "/dashboard/messages",   label: "Messages",          icon: MessageSquare, badge: unreadMessages > 0 ? unreadMessages : undefined },
@@ -172,7 +172,7 @@ if (isLoading || !user)
           className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-red-500 transition-all flex-1"
         >
           <LogOut className="w-5 h-5" />
-          <span className="text-[9px] font-bold leading-none">Quitter</span>
+          <span className="text-[9px] font-bold leading-none">Se deconnecter</span>
         </button>
       </nav>
     </div>

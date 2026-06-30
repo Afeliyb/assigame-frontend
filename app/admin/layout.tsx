@@ -21,7 +21,7 @@ import {
 import { getAvatarUrl } from "@/lib/utils";
 
 const LINKS = [
-  { href: "/admin",            label: "Vue d'ensemble", icon: LayoutDashboard },
+  { href: "/admin",            label: "Statistiques", icon: LayoutDashboard },
   { href: "/admin/products",   label: "Produits",       icon: Package },
   { href: "/admin/categories", label: "Catégories",     icon: Tags },
   { href: "/admin/users",      label: "Utilisateurs",   icon: Users },
@@ -152,7 +152,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           className="flex flex-col items-center gap-0.5 px-2 py-1.5 text-red-500 flex-1"
         >
           <LogOut className="w-5 h-5" />
-          <span className="text-[9px] font-bold">Quitter</span>
+          <span className="text-[9px] font-bold">Se deconnecter</span>
         </button>
       </nav>
     </div>

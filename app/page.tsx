@@ -83,7 +83,7 @@ export default function HomePage() {
   const trustedSellers = useMemo(() => {
     const map = new Map<string, NonNullable<(typeof onlineListings)[number]["seller"]>>();
     onlineListings.forEach((p) => { if (p.seller && !map.has(p.seller.id)) map.set(p.seller.id, p.seller); });
-    return Array.from(map.values()).slice(0, 5);
+    return Array.from(map.values());
   }, [onlineListings]);
 
   // Stats par ville
@@ -161,7 +161,7 @@ export default function HomePage() {
             {stats.total > 0 && (
               <div className="flex items-center gap-5 text-sm">
                 <div className="flex flex-col">
-                  <span className="font-black text-2xl leading-tight">{stats.total}</span>
+                  <span className="font-black text-2xl leading-tight">{stats.total}+</span>
                   <span className="text-black/50 dark:text-white/50 text-xs">Annonces</span>
                 </div>
                 <div className="w-px h-8 bg-[var(--border-subtle)]" />
@@ -171,7 +171,7 @@ export default function HomePage() {
                 </div>
                 <div className="w-px h-8 bg-[var(--border-subtle)]" />
                 <div className="flex flex-col">
-                  <span className="font-black text-2xl leading-tight">{stats.categories}</span>
+                  <span className="font-black text-2xl leading-tight">{stats.categories}+</span>
                   <span className="text-black/50 dark:text-white/50 text-xs">Catégories</span>
                 </div>
               </div>

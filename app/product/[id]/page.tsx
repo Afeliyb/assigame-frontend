@@ -4,8 +4,14 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowLeft, Heart, MapPin, ExternalLink,
-  Calendar, Eye, Loader2, AlertTriangle,
+  ArrowLeft,
+  Heart,
+  MapPin,
+  ExternalLink,
+  Calendar,
+  Eye,
+  Loader2,
+  AlertTriangle,
 } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { useCursor } from "@/components/cursor-provider";
@@ -34,31 +40,52 @@ export default function ProductDetailPage({
   const { favoriteIds, toggle: toggleFavorite } = useFavorites();
   const router = useRouter();
 
-  const [product, setProduct]           = useState<Product | null>(null);
-  const [isLoading, setIsLoading]       = useState(true);
-  const [error, setError]               = useState<string | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
-  const [activeImage, setActiveImage]   = useState(0);
+  const [activeImage, setActiveImage] = useState(0);
 
   const isLiked = id ? favoriteIds.has(id) : false;
 
   const handleLike = async () => {
-    if (!user) { router.push("/auth"); return; }
+    if (!user) {
+      router.push("/auth");
+      return;
+    }
     if (id) await toggleFavorite(id);
   };
 
-  useEffect(() => { params.then((p) => setId(p.id)); }, [params]);
+  useEffect(() => {
+    params.then((p) => setId(p.id));
+  }, [params]);
 
   useEffect(() => {
     if (!id) return;
     let cancelled = false;
     setIsLoading(true);
     fetchProduitById(id)
-      .then((data) => { if (!cancelled) { setProduct(data); incrementerVuesProduit(id); } })
-      .catch((e)   => { if (!cancelled) setError(e instanceof ApiError ? e.message : "Impossible de charger cette annonce."); })
-      .finally(()  => { if (!cancelled) setIsLoading(false); });
-    return () => { cancelled = true; };
+      .then((data) => {
+        if (!cancelled) {
+          setProduct(data);
+          incrementerVuesProduit(id);
+        }
+      })
+      .catch((e) => {
+        if (!cancelled)
+          setError(
+            e instanceof ApiError
+              ? e.message
+              : "Impossible de charger cette annonce.",
+          );
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   /* ── États de chargement / erreur ── */
@@ -73,8 +100,13 @@ export default function ProductDetailPage({
     return (
       <div className="min-h-screen pt-20 flex flex-col items-center justify-center gap-4 px-4 text-center">
         <AlertTriangle className="w-10 h-10 opacity-30" />
-        <h1 className="text-2xl font-black">{error ?? "Produit introuvable"}</h1>
-        <Link href="/browse" className="text-sm underline underline-offset-4 opacity-60">
+        <h1 className="text-2xl font-black">
+          {error ?? "Produit introuvable"}
+        </h1>
+        <Link
+          href="/browse"
+          className="text-sm underline underline-offset-4 opacity-60"
+        >
           Retour au catalogue
         </Link>
       </div>
@@ -85,34 +117,49 @@ export default function ProductDetailPage({
   const category = categories.find((c) => c.id === product.categoryId);
 
   const relatedProducts = listings
-    .filter((p) => p.categoryId === product.categoryId && p.id !== product.id && p.status === "En ligne")
+    .filter(
+      (p) =>
+        p.categoryId === product.categoryId &&
+        p.id !== product.id &&
+        p.status === "En ligne",
+    )
     .slice(0, 5);
 
-  const joinedYear = seller?.joinedAt ? new Date(seller.joinedAt).getFullYear() : null;
+  const joinedYear = seller?.joinedAt
+    ? new Date(seller.joinedAt).getFullYear()
+    : null;
 
   return (
     <div className="min-h-screen bg-[var(--background)] pt-[72px] pb-16">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
-
         {/* ── Breadcrumb compact ── */}
         <div className="flex items-center gap-2 py-4 text-xs text-black/40 dark:text-white/40">
-          <Link href="/browse" className="hover:text-black dark:hover:text-white transition-colors flex items-center gap-1">
+          <Link
+            href="/browse"
+            className="hover:text-black dark:hover:text-white transition-colors flex items-center gap-1"
+          >
             <ArrowLeft className="w-3.5 h-3.5" />
             Catalogue
           </Link>
-          {category && <>
-            <span>/</span>
-            <Link href={`/browse?category=${category.slug}`} className="hover:text-black dark:hover:text-white transition-colors">
-              {category.name}
-            </Link>
-          </>}
+          {category && (
+            <>
+              <span>/</span>
+              <Link
+                href={`/browse?category=${category.slug}`}
+                className="hover:text-black dark:hover:text-white transition-colors"
+              >
+                {category.name}
+              </Link>
+            </>
+          )}
           <span>/</span>
-          <span className="truncate max-w-[200px] text-black/60 dark:text-white/60">{product.title}</span>
+          <span className="truncate max-w-[200px] text-black/60 dark:text-white/60">
+            {product.title}
+          </span>
         </div>
 
         {/* ═══ LAYOUT PRINCIPAL ═══ */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_360px] gap-6 lg:gap-8">
-
           {/* ── Colonne gauche : galerie ── */}
           <div className="flex flex-col gap-3">
             {/* Image principale — hauteur limitée */}
@@ -120,7 +167,10 @@ export default function ProductDetailPage({
               className="relative w-full h-[300px] sm:h-[380px] lg:h-[420px] rounded-2xl overflow-hidden bg-[var(--surface-elevated)] cursor-zoom-in"
               onMouseEnter={() => setCursorLabel("Zoom")}
               onMouseLeave={() => setCursorLabel(null)}
-              onClick={() => { setLightboxIndex(activeImage); setLightboxOpen(true); }}
+              onClick={() => {
+                setLightboxIndex(activeImage);
+                setLightboxOpen(true);
+              }}
             >
               <Image
                 src={product.images[activeImage] ?? product.images[0]}
@@ -169,7 +219,6 @@ export default function ProductDetailPage({
 
           {/* ── Colonne droite : infos + vendeur (compact, sticky) ── */}
           <div className="flex flex-col gap-4 lg:sticky lg:top-[72px] lg:h-fit">
-
             {/* Titre + prix */}
             <div>
               {product.status !== "En ligne" && (
@@ -182,7 +231,9 @@ export default function ProductDetailPage({
               </h1>
               <div className="text-2xl sm:text-3xl font-black mb-3">
                 {product.price.toLocaleString("fr-FR")}
-                <span className="text-base font-bold text-black/40 dark:text-white/40 ml-1.5">FCFA</span>
+                <span className="text-base font-bold text-black/40 dark:text-white/40 ml-1.5">
+                  FCFA
+                </span>
               </div>
               {/* Badges */}
               <div className="flex flex-wrap gap-1.5">
@@ -190,8 +241,10 @@ export default function ProductDetailPage({
                   {product.condition}
                 </span>
                 {category && (
-                  <Link href={`/browse?category=${category.slug}`}
-                    className="px-2.5 py-1 bg-[var(--surface-elevated)] rounded-full text-xs font-semibold border border-[var(--border-subtle)] hover:border-[var(--foreground)] transition-colors">
+                  <Link
+                    href={`/browse?category=${category.slug}`}
+                    className="px-2.5 py-1 bg-[var(--surface-elevated)] rounded-full text-xs font-semibold border border-[var(--border-subtle)] hover:border-[var(--foreground)] transition-colors"
+                  >
                     {category.name}
                   </Link>
                 )}
@@ -212,7 +265,9 @@ export default function ProductDetailPage({
             <div className="flex justify-end">
               <button
                 onClick={handleLike}
-                aria-label={isLiked ? "Retirer des favoris" : "Ajouter aux favoris"}
+                aria-label={
+                  isLiked ? "Retirer des favoris" : "Ajouter aux favoris"
+                }
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm font-medium transition-all ${
                   isLiked
                     ? "bg-red-500/10 border-red-500/30 text-red-500"
@@ -225,18 +280,25 @@ export default function ProductDetailPage({
             </div>
 
             {/* ── Boutons de contact (protégés) ── */}
-            {seller && product.status === "En ligne" && user?.id !== String(seller.id) && (
-              <ContactButtons
-                sellerId={seller.id}
-                sellerName={seller.name}
-                productTitle={product.title}
-                productId={product.id}
-                disabled={false}
-              />
-            )}
+            {seller &&
+              product.status === "En ligne" &&
+              user?.id !== String(seller.id) && (
+                <ContactButtons
+                  sellerId={product.sellerId}
+                  sellerName={product.seller?.name ?? ""}
+                  productTitle={product.title}
+                  productId={product.id}
+                  productPrice={product.price}
+                  productImage={product.images[0]}
+                />
+              )}
             {product.status !== "En ligne" && (
               <div className="py-3 px-4 bg-[var(--surface-elevated)] rounded-2xl text-sm text-center text-black/50 dark:text-white/50 border border-[var(--border-subtle)]">
-                Cette annonce est marquée <span className="font-bold text-black dark:text-white">{product.status}</span> et n&apos;est plus disponible.
+                Cette annonce est marquée{" "}
+                <span className="font-bold text-black dark:text-white">
+                  {product.status}
+                </span>{" "}
+                et n&apos;est plus disponible.
               </div>
             )}
 
@@ -292,7 +354,9 @@ export default function ProductDetailPage({
         {relatedProducts.length > 0 && (
           <div className="mt-10 pt-8 border-t border-[var(--border-subtle)]">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-black text-xl">Vous aimerez aussi</h2>
+              <h2 className="font-display font-black text-xl">
+                Vous aimerez aussi
+              </h2>
               <Link
                 href={`/browse?category=${category?.slug ?? ""}`}
                 className="text-xs font-semibold opacity-50 hover:opacity-100 transition-opacity"

@@ -19,6 +19,7 @@ import type { Message } from "@/lib/types";
 import type { Seller } from "@/lib/types";
 import { getAvatarUrl } from "@/lib/utils";
 
+// app/dashboard/messages/[id]/page.tsx
 // ============================================================
 // HELPERS DE FORMATAGE
 // ============================================================
@@ -269,7 +270,7 @@ export default function ConversationPage({
   if (!user) return null;
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-136px)] md:h-[calc(100dvh-64px)] w-full max-w-3xl overflow-hidden">
+    <div className="fixed inset-x-0 top-14 bottom-16 md:bottom-0 md:left-56 lg:left-60 flex flex-col bg-[var(--background)] overflow-hidden">
       {/* ---- EN-TÊTE ---- */}
       <div className="flex items-center gap-3 p-4 border-b border-[var(--border-subtle)] bg-[var(--background)] shrink-0">
         <Link

@@ -84,7 +84,7 @@ export default function AdminPage() {
     <div>
       {/* En-tête */}
       <div className="mb-8">
-        <h1 className="font-display font-black text-3xl">Vue d'ensemble</h1>
+        <h1 className="font-display font-black text-3xl">Statistiques</h1>
         <p className="text-sm text-black/50 dark:text-white/50 mt-1">
           Bienvenue sur le panneau d'administration Assigame.
         </p>
