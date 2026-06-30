@@ -19,6 +19,9 @@ import {
   Check,
   Wifi,
   MessageSquare,
+  Heart,
+  LogOut,
+  LayoutDashboard,
 } from "lucide-react";
 import { Logo } from "./logo";
 import { TogoFlag, FranceFlag, UKFlag } from "./flags";
@@ -34,7 +37,7 @@ import { fetchNonLus } from "@/lib/api/messages";
 export function Navbar() {
   const { scrollY } = useScroll();
   const { theme, setTheme } = useTheme();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { categories } = useCategories();
   const { lang, setLang, t } = useLanguage();
   const { selectedCity, setSelectedCity } = useLocation();
@@ -95,6 +98,12 @@ export function Navbar() {
       trimmed ? `/browse?q=${encodeURIComponent(trimmed)}` : "/browse",
     );
   };
+
+  const handleLogout = () => {
+  logout();
+  setMobileMenuOpen(false);
+  router.push("/");
+};
 
   return (
     <>
@@ -460,105 +469,84 @@ export function Navbar() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-5">
-                {/* Profil */}
-                {user && (
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 p-3 bg-[var(--surface-elevated)] rounded-2xl"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={user.avatar || getAvatarUrl(user.name)}
-                      alt={user.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                    <div>
-                      <p className="font-bold text-sm">{user.name}</p>
-                      <p className="text-xs text-black/50 dark:text-white/50">
-                        Tableau de bord
-                      </p>
-                    </div>
-                  </Link>
-                )}
+                {/* Profil + liens rapides */}
+{user && (
+  <div className="flex flex-col gap-1.5">
+    <Link
+      href="/dashboard"
+      onClick={() => setMobileMenuOpen(false)}
+      className="flex items-center gap-3 p-3 bg-[var(--surface-elevated)] rounded-2xl"
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={user.avatar || getAvatarUrl(user.name)}
+        alt={user.name}
+        className="w-10 h-10 rounded-full object-cover"
+      />
+      <div>
+        <p className="font-bold text-sm">{user.name}</p>
+        <p className="text-xs text-black/50 dark:text-white/50">
+          Tableau de bord
+        </p>
+      </div>
+    </Link>
 
-                {/* Recherche */}
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    setMobileMenuOpen(false);
-                    goToSearch(query);
-                  }}
-                >
-                  <div className="relative">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
-                    <input
-                      type="text"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Rechercher..."
-                      className="w-full pl-9 pr-4 py-3 rounded-2xl bg-[var(--surface-elevated)] outline-none text-sm"
-                    />
-                  </div>
-                </form>
+    <div className="grid grid-cols-2 gap-1.5">
+      <Link
+        href="/dashboard/favorites"
+        onClick={() => setMobileMenuOpen(false)}
+        className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[var(--surface-elevated)] text-sm font-semibold hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+      >
+        <Heart className="w-4 h-4 opacity-60" />
+        Favoris
+      </Link>
+      <Link
+        href="/dashboard/messages"
+        onClick={() => setMobileMenuOpen(false)}
+        className="relative flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[var(--surface-elevated)] text-sm font-semibold hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+      >
+        <MessageSquare className="w-4 h-4 opacity-60" />
+        Messages
+        {unreadMessages > 0 && (
+          <span className="ml-auto flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+            {unreadMessages > 9 ? "9+" : unreadMessages}
+          </span>
+        )}
+      </Link>
+    </div>
 
-                {/* Localisation */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <TogoFlag className="w-5 h-3.5" />
-                    <p className="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40">
-                      Localisation · {TOGO_DIAL.code}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => setSelectedCity(null)}
-                      className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
-                        !selectedCity
-                          ? "bg-[var(--foreground)] text-[var(--background)]"
-                          : "bg-[var(--surface-elevated)]"
-                      }`}
-                    >
-                      Tout le Togo
-                    </button>
-                    {TOGO_REGIONS.flatMap((r) => r.cities.slice(0, 2)).map(
-                      (city) => (
-                        <button
-                          key={city}
-                          onClick={() => setSelectedCity(city)}
-                          className={`px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1 ${
-                            selectedCity === city
-                              ? "bg-[var(--foreground)] text-[var(--background)]"
-                              : "bg-[var(--surface-elevated)]"
-                          }`}
-                        >
-                          <MapPin className="w-3 h-3 opacity-50" />
-                          {city}
-                        </button>
-                      ),
-                    )}
-                  </div>
-                </div>
+    {user.isAdmin && (
+      <Link
+        href="/admin"
+        onClick={() => setMobileMenuOpen(false)}
+        className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-orange-500/10 text-orange-600 text-sm font-bold hover:bg-orange-500/20 transition-colors"
+      >
+        <LayoutDashboard className="w-4 h-4" />
+        Panneau admin
+      </Link>
+    )}
+  </div>
+)}
 
-                {/* Catégories */}
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40 mb-2">
-                    Catégories
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((c) => (
-                      <Link
-                        key={c.id}
-                        href={`/browse?category=${c.slug}`}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="px-3 py-1.5 bg-[var(--surface-elevated)] rounded-full text-sm font-medium"
-                      >
-                        {c.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-
+{/* Recherche */}
+<form
+  onSubmit={(e) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+    goToSearch(query);
+  }}
+>
+  <div className="relative">
+    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
+    <input
+      type="text"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      placeholder="Rechercher..."
+      className="w-full pl-9 pr-4 py-3 rounded-2xl bg-[var(--surface-elevated)] outline-none text-sm"
+    />
+  </div>
+</form>
                 {/* Langue */}
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40 mb-2">
@@ -591,24 +579,33 @@ export function Navbar() {
               </div>
 
               <div className="p-4 border-t border-[var(--border-subtle)] flex flex-col gap-2">
-                {!user && (
-                  <Link
-                    href="/auth"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full py-3 text-center font-semibold bg-[var(--surface-elevated)] rounded-full"
-                  >
-                    Connexion
-                  </Link>
-                )}
-                <Link
-                  href="/dashboard/new"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-3 text-center font-bold bg-[var(--foreground)] text-[var(--background)] rounded-full flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  Vendre un article
-                </Link>
-              </div>
+  {!user && (
+    <Link
+      href="/auth"
+      onClick={() => setMobileMenuOpen(false)}
+      className="w-full py-3 text-center font-semibold bg-[var(--surface-elevated)] rounded-full"
+    >
+      Connexion
+    </Link>
+  )}
+  <Link
+    href="/dashboard/new"
+    onClick={() => setMobileMenuOpen(false)}
+    className="w-full py-3 text-center font-bold bg-[var(--foreground)] text-[var(--background)] rounded-full flex items-center justify-center gap-2"
+  >
+    <Plus className="w-4 h-4" />
+    Vendre un article
+  </Link>
+  {user && (
+    <button
+      onClick={handleLogout}
+      className="w-full py-3 text-center font-semibold text-red-500 hover:bg-red-500/10 rounded-full flex items-center justify-center gap-2 transition-colors"
+    >
+      <LogOut className="w-4 h-4" />
+      Déconnexion
+    </button>
+  )}
+</div>
             </motion.div>
           </motion.div>
         )}

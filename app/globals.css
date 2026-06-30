@@ -43,6 +43,20 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+    input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  @media (min-width: 640px) {
+    input,
+    textarea,
+    select {
+      font-size: inherit;
+    }
+  }
 }
 
 @layer utilities {
