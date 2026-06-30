@@ -106,7 +106,7 @@ export default function HomePage() {
   }), [onlineListings, trustedSellers, categories]);
 
   return (
-    <div className="relative min-h-screen bg-[var(--background)] flex flex-col pt-[88px]">
+    <div className="relative min-h-screen bg-[var(--background)] flex flex-col pt-[88px] pb-20 md:pb-0">
       {/* INTRO */}
       <AnimatePresence mode="wait">
         {!introFinished && (
@@ -393,7 +393,7 @@ export default function HomePage() {
                 {t.home_see_all} <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
               {trending.map((p) => <ProductCard key={p.id} product={p} />)}
             </div>
           </Reveal>

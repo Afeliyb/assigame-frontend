@@ -17,19 +17,24 @@ import {
   LogOut,
   ChevronRight,
   ShieldCheck,
+  ArrowLeft,
 } from "lucide-react";
 import { getAvatarUrl } from "@/lib/utils";
 
 const LINKS = [
-  { href: "/admin",            label: "Statistiques", icon: LayoutDashboard },
-  { href: "/admin/products",   label: "Produits",       icon: Package },
-  { href: "/admin/categories", label: "Catégories",     icon: Tags },
-  { href: "/admin/users",      label: "Utilisateurs",   icon: Users },
+  { href: "/admin", label: "Statistiques", icon: LayoutDashboard },
+  { href: "/admin/products", label: "Produits", icon: Package },
+  { href: "/admin/categories", label: "Catégories", icon: Tags },
+  { href: "/admin/users", label: "Utilisateurs", icon: Users },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
-  const router   = useRouter();
+  const router = useRouter();
   const { user, logout, isLoading } = useAuth();
 
   useEffect(() => {
@@ -51,10 +56,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="h-screen overflow-hidden bg-[var(--background)] pt-14 flex">
-
       {/* ═══ SIDEBAR FIXE (desktop) ═══ */}
       <aside className="hidden md:flex flex-col w-56 lg:w-60 shrink-0 border-r border-[var(--border-subtle)] bg-[var(--surface-elevated)]/40 h-full">
-
         {/* En-tête admin */}
         <div className="p-4 border-b border-[var(--border-subtle)]">
           <div className="flex items-center gap-2 mb-3">
@@ -72,7 +75,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             />
             <div className="min-w-0">
               <p className="font-bold text-xs truncate">{user.name}</p>
-              <p className="text-[10px] font-bold text-orange-500">Administrateur</p>
+              <p className="text-[10px] font-bold text-orange-500">
+                Administrateur
+              </p>
             </div>
           </div>
         </div>
@@ -102,11 +107,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Pied de sidebar */}
         <div className="p-3 border-t border-[var(--border-subtle)] flex flex-col gap-1">
           <Link
-            href="/dashboard"
+            href="/"
             className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-black/50 dark:text-white/50 hover:bg-[var(--surface-elevated)] transition-colors"
           >
-            <LayoutDashboard className="w-3.5 h-3.5" />
-            Mon dashboard
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Voir le site
           </Link>
           <button
             onClick={handleLogout}
@@ -120,9 +125,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* ═══ CONTENU PRINCIPAL ═══ */}
       <main className="flex-1 overflow-y-auto">
-        <div className="p-5 pb-24 md:pb-5 md:p-8 lg:p-10">
-          {children}
-        </div>
+        <div className="p-5 pb-24 md:pb-5 md:p-8 lg:p-10">{children}</div>
       </main>
 
       {/* ═══ BOTTOM NAV MOBILE ═══ */}
@@ -139,8 +142,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   : "text-black/40 dark:text-white/40"
               }`}
             >
-              <Icon className={`w-5 h-5 transition-all ${isActive ? "scale-110" : ""}`} />
-              <span className="text-[9px] font-bold">{label.split(" ")[0]}</span>
+              <Icon
+                className={`w-5 h-5 transition-all ${isActive ? "scale-110" : ""}`}
+              />
+              <span className="text-[9px] font-bold">
+                {label.split(" ")[0]}
+              </span>
               {isActive && (
                 <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[var(--foreground)] rounded-full" />
               )}

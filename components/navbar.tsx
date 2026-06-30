@@ -5,23 +5,9 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { motion, useScroll, AnimatePresence } from "motion/react";
 import {
-  Search,
-  Sun,
-  Moon,
-  Menu,
-  X,
-  Plus,
-  MapPin,
-  ChevronDown,
-  Globe,
-  Banknote,
-  Clock,
-  Check,
-  Wifi,
-  MessageSquare,
-  Heart,
-  LogOut,
-  LayoutDashboard,
+  Search, Sun, Moon, Menu, X, Plus, MapPin, ChevronDown,
+  Globe, Check, MessageSquare, Heart, LogOut,
+  LayoutDashboard, Tags, User,
 } from "lucide-react";
 import { Logo } from "./logo";
 import { TogoFlag, FranceFlag, UKFlag } from "./flags";
@@ -472,60 +458,57 @@ export function Navbar() {
                 {/* Profil + liens rapides */}
 {user && (
   <div className="flex flex-col gap-1.5">
-    <Link
-      href="/dashboard"
-      onClick={() => setMobileMenuOpen(false)}
-      className="flex items-center gap-3 p-3 bg-[var(--surface-elevated)] rounded-2xl"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={user.avatar || getAvatarUrl(user.name)}
-        alt={user.name}
-        className="w-10 h-10 rounded-full object-cover"
-      />
-      <div>
-        <p className="font-bold text-sm">{user.name}</p>
-        <p className="text-xs text-black/50 dark:text-white/50">
-          Tableau de bord
-        </p>
-      </div>
-    </Link>
-
-    <div className="grid grid-cols-2 gap-1.5">
-      <Link
-        href="/dashboard/favorites"
-        onClick={() => setMobileMenuOpen(false)}
-        className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[var(--surface-elevated)] text-sm font-semibold hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
-      >
-        <Heart className="w-4 h-4 opacity-60" />
-        Favoris
-      </Link>
-      <Link
-        href="/dashboard/messages"
-        onClick={() => setMobileMenuOpen(false)}
-        className="relative flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[var(--surface-elevated)] text-sm font-semibold hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
-      >
-        <MessageSquare className="w-4 h-4 opacity-60" />
-        Messages
-        {unreadMessages > 0 && (
-          <span className="ml-auto flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
-            {unreadMessages > 9 ? "9+" : unreadMessages}
-          </span>
-        )}
-      </Link>
+  <Link
+    href="/dashboard"
+    onClick={() => setMobileMenuOpen(false)}
+    className="flex items-center gap-3 p-3 bg-[var(--surface-elevated)] rounded-2xl"
+  >
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    <img
+      src={user.avatar || getAvatarUrl(user.name)}
+      alt={user.name}
+      className="w-10 h-10 rounded-full object-cover"
+    />
+    <div>
+      <p className="font-bold text-sm">{user.name}</p>
+      <p className="text-xs text-black/50 dark:text-white/50">Tableau de bord</p>
     </div>
+  </Link>
 
-    {user.isAdmin && (
-      <Link
-        href="/admin"
-        onClick={() => setMobileMenuOpen(false)}
-        className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-orange-500/10 text-orange-600 text-sm font-bold hover:bg-orange-500/20 transition-colors"
-      >
-        <LayoutDashboard className="w-4 h-4" />
-        Panneau admin
-      </Link>
-    )}
-  </div>
+  {[
+    { href: "/dashboard",           label: "Statistiques",  icon: LayoutDashboard },
+    { href: "/dashboard/listings",  label: "Mes annonces",  icon: Tags },
+    { href: "/dashboard/favorites", label: "Mes favoris",   icon: Heart },
+    { href: "/dashboard/messages",  label: "Messages",      icon: MessageSquare, badge: unreadMessages },
+    { href: "/dashboard/profile",   label: "Mon profil",    icon: User },
+  ].map(({ href, label, icon: Icon, badge }) => (
+    <Link
+      key={href}
+      href={href}
+      onClick={() => setMobileMenuOpen(false)}
+      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--surface-elevated)] transition-colors"
+    >
+      <Icon className="w-4 h-4 opacity-50 shrink-0" />
+      <span className="text-sm font-semibold flex-1">{label}</span>
+      {!!badge && badge > 0 && (
+        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+          {badge > 9 ? "9+" : badge}
+        </span>
+      )}
+    </Link>
+  ))}
+
+  {user.isAdmin && (
+    <Link
+      href="/admin"
+      onClick={() => setMobileMenuOpen(false)}
+      className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-orange-500/10 transition-colors"
+    >
+      <LayoutDashboard className="w-4 h-4 text-orange-500 shrink-0" />
+      <span className="text-sm font-bold text-orange-600 flex-1">Panneau admin</span>
+    </Link>
+  )}
+</div>
 )}
 
 {/* Recherche */}

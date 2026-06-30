@@ -276,7 +276,7 @@ function BrowseContent() {
         {!isLoading && !error && displayProducts.length > 0 && (
           <>
             {viewMode === "grid" ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 md:gap-4">
                 {displayProducts.map((p, i) => (
                   <motion.div
                     key={p.id}

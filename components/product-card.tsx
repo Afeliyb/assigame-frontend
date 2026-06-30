@@ -40,7 +40,7 @@ export function ProductCard({ product }: { product: Product }) {
       onMouseEnter={() => setCursorLabel("Voir")}
       onMouseLeave={() => setCursorLabel(null)}
     >
-      <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-[var(--surface-elevated)]">
+      <div className="relative aspect-square sm:aspect-[3/4] overflow-hidden rounded-xl sm:rounded-2xl bg-[var(--surface-elevated)]">
         <Image
           src={product.images[0]}
           alt={product.title}
@@ -87,14 +87,14 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       <div className="flex flex-col gap-0.5 px-0.5">
-        <h3 className="font-semibold text-sm line-clamp-1 group-hover:text-black/70 dark:group-hover:text-white/70 transition-colors">
-          {product.title}
-        </h3>
-        <p className="text-xs text-black/60 dark:text-white/60 line-clamp-1">
-          {product.condition}
-          {category ? ` • ${category.name}` : ""}
-        </p>
-      </div>
+  <h3 className="font-semibold text-xs sm:text-sm line-clamp-1 group-hover:text-black/70 dark:group-hover:text-white/70 transition-colors">
+    {product.title}
+  </h3>
+  <p className="text-[10px] sm:text-xs text-black/60 dark:text-white/60 line-clamp-1">
+    {product.condition}
+    {category ? ` • ${category.name}` : ""}
+  </p>
+</div>
     </Link>
   );
 }

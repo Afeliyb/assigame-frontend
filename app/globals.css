@@ -57,6 +57,12 @@
       font-size: inherit;
     }
   }
+
+  @media (max-width: 767px) {
+  body {
+    padding-bottom: 64px;
+  }
+}
 }
 
 @layer utilities {

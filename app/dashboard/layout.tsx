@@ -135,46 +135,7 @@ if (isLoading || !user)
         </div>
       </main>
 
-      {/* ═══ BOTTOM NAV MOBILE — fixe en bas, icônes + labels courts ═══ */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--background)]/95 backdrop-blur-xl border-t border-[var(--border-subtle)] flex items-center justify-around px-1 py-2">
-        {LINKS.map((link) => {
-          const Icon    = link.icon;
-          const isActive = pathname === link.href;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`relative flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all min-w-0 flex-1 ${
-                isActive
-                  ? "text-[var(--foreground)]"
-                  : "text-black/40 dark:text-white/40"
-              }`}
-            >
-              <Icon className={`w-5 h-5 transition-all ${isActive ? "scale-110" : ""}`} />
-              <span className={`text-[9px] font-bold truncate w-full text-center leading-none ${isActive ? "opacity-100" : "opacity-60"}`}>
-                {link.label.replace("Mes ", "").replace("Mon ", "")}
-              </span>
-              {link.badge !== undefined && (
-                <span className="absolute top-1 right-1 w-3.5 h-3.5 text-[8px] font-black bg-red-500 text-white rounded-full flex items-center justify-center">
-                  {link.badge}
-                </span>
-              )}
-              {isActive && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[var(--foreground)] rounded-full" />
-              )}
-            </Link>
-          );
-        })}
-
-        {/* Bouton Déconnexion — toujours visible en bas à droite */}
-        <button
-          onClick={() => { logout(); router.push("/"); }}
-          className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-red-500 transition-all flex-1"
-        >
-          <LogOut className="w-5 h-5" />
-          <span className="text-[9px] font-bold leading-none">Se deconnecter</span>
-        </button>
-      </nav>
+      
     </div>
   );
 }

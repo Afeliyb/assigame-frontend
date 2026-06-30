@@ -11,6 +11,7 @@ import { FavoritesProvider } from "@/components/favorites-provider";
 import { LanguageProvider }  from "@/components/language-provider";
 import { LocationProvider }  from "@/components/location-provider";
 import { Navbar }            from "@/components/navbar";
+import { BottomNav } from "@/components/bottom-nav";
 // On importe le nouveau composant conditionnel
 import { ConditionalFooter } from "@/components/conditional-footer"; 
 
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
                         </main>
                         {/* Le composant intelligent qui gère l'affichage */}
                         <ConditionalFooter />
+                        <BottomNav />
                       </CursorProvider>
                     </FavoritesProvider>
                   </ListingsProvider>
