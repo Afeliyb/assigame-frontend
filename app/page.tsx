@@ -189,9 +189,9 @@ export default function HomePage() {
             {/* Badges confiance */}
             <div className="flex flex-wrap gap-3 text-xs text-black/50 dark:text-white/50">
               {[
-                { icon: Shield, label: "Transactions sécurisées" },
-                { icon: Zap, label: "Contact rapide" },
-                { icon: Users, label: "Vendeurs vérifiés" },
+                { icon: Shield, label: "Sécurisé" },
+                { icon: Zap, label: "Chat Direct" },
+                { icon: Users, label: "Profils Vérifiés" },
               ].map(({ icon: Icon, label }) => (
                 <span key={label} className="flex items-center gap-1.5">
                   <Icon className="w-3.5 h-3.5 text-green-500" /> {label}
